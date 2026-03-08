@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <meta name="robots" content="noindex" />
+    <title>Profile — ScanBite Admin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="/assets/css/style.css" />
+    <link rel="stylesheet" href="/assets/css/admin.css" />
+</head>
+
+<body class="admin-body">
+
+    <div id="sidebarMount"></div>
+
+    <div class="admin-main" id="adminMain">
+        <div class="admin-topbar">
+            <div class="admin-topbar-left">
+                <button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle sidebar">☰</button>
+                <div class="page-title">Profile &amp; Settings</div>
+            </div>
+        </div>
+
+        <div id="toast-container" aria-live="polite"></div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start">
+
+            <!-- ── Profile Info Card ── -->
+            <div class="card">
+                <div class="card-header">
+                    <span>Restaurant Profile</span>
+                </div>
+                <div class="card-body">
+                    <!-- Logo preview -->
+                    <div style="display:flex;align-items:center;gap:18px;margin-bottom:24px">
+                        <div id="logoPreviewWrap"
+                            style="position:relative;width:80px;height:80px;border-radius:16px;overflow:hidden;border:2px solid var(--border);background:var(--bg);display:grid;place-items:center;font-size:2rem;flex-shrink:0">
+                            <span id="logoPlaceholder" aria-hidden="true">🌿</span>
+                            <img id="logoPreviewImg" src="" alt="Restaurant logo"
+                                style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:none" />
+                        </div>
+                        <div>
+                            <div style="font-weight:700;color:var(--dark)" id="profileRestaurantName">—</div>
+                            <div style="font-size:.8rem;color:var(--muted)" id="profileSlug">—</div>
+                            <label class="btn btn-outline btn-sm"
+                                style="margin-top:8px;cursor:pointer;display:inline-flex;align-items:center;gap:6px"
+                                for="logoInput">
+                                📷 Change Logo
+                            </label>
+                            <input type="file" id="logoInput" accept="image/*" style="display:none"
+                                aria-label="Upload restaurant logo" />
+                        </div>
+                    </div>
+
+                    <form id="profileForm" novalidate>
+                        <div class="form-group">
+                            <label class="form-label" for="profRestaurantName">Restaurant Name</label>
+                            <input class="form-input" type="text" id="profRestaurantName"
+                                placeholder="Your restaurant name" />
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="profAdminName">Admin Name</label>
+                            <input class="form-input" type="text" id="profAdminName" placeholder="e.g. Rahul Sharma" />
+                        </div>
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+                            <div class="form-group" style="margin-bottom:0">
+                                <label class="form-label" for="profPhone">Phone</label>
+                                <input class="form-input" type="tel" id="profPhone" maxlength="10"
+                                    placeholder="9XXXXXXXXX" />
+                            </div>
+                            <div class="form-group" style="margin-bottom:0">
+                                <label class="form-label" for="profEmail">Email (read-only)</label>
+                                <input class="form-input" type="email" id="profEmail" readonly
+                                    style="opacity:.6;cursor:not-allowed" />
+                            </div>
+                        </div>
+                        <div class="form-group" style="margin-top:16px">
+                            <label class="form-label" for="profAddress">Address</label>
+                            <textarea class="form-input form-textarea" id="profAddress"
+                                placeholder="Restaurant address"></textarea>
+                        </div>
+
+                        <!-- 🎨 Modern Brand Color UI -->
+                        <div class="form-group"
+                            style="margin-top:20px;padding-top:20px;border-top:1px solid var(--border)">
+                            <label class="form-label">Primary Brand Color</label>
+                            <div style="display:flex;align-items:center;gap:18px">
+                                <!-- Large Color Preview -->
+                                <div id="colorPreviewBox"
+                                    style="width:64px;height:64px;border-radius:12px;background:var(--primary);box-shadow:0 4px 12px var(--primary-glow);flex-shrink:0;border:3px solid #fff">
+                                </div>
+
+                                <div style="flex:1">
+                                    <div style="display:flex;gap:10px">
+                                        <div style="position:relative;flex:1">
+                                            <input type="text" id="themeColorHex" class="form-input" value="#ff6b35"
+                                                style="text-transform:uppercase;font-family:monospace;font-weight:600"
+                                                aria-label="Hex color value" />
+                                            <div
+                                                style="position:absolute;right:12px;top:50%;transform:translateY(-50%);font-size:.7rem;color:var(--muted);pointer-events:none">
+                                                HEX</div>
+                                        </div>
+
+                                        <!-- Hidden but clickable color picker -->
+                                        <div style="position:relative">
+                                            <button type="button" class="btn btn-outline"
+                                                style="padding:0 12px;height:100%" id="pickColorBtn">
+                                                🎨 Pick
+                                            </button>
+                                            <input type="color" id="themeColorInput" value="#ff6b35"
+                                                style="position:absolute;inset:0;opacity:0;cursor:pointer;width:100%"
+                                                aria-label="Open color picker" />
+                                        </div>
+                                    </div>
+                                    <p style="font-size:.7rem;color:var(--muted);margin-top:6px">
+                                        This color will be applied to your sidebar, buttons, and charts.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-full" id="saveProfileBtn">
+                            <span class="btn-text">💾 Save Profile</span>
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- ── Change Password Card ── -->
+            <div class="card">
+                <div class="card-header">
+                    <span>Change Password</span>
+                </div>
+                <div class="card-body">
+                    <p style="font-size:.85rem;color:var(--muted);margin-bottom:22px;line-height:1.65">
+                        Leave these fields blank if you don't want to change your password.
+                        Your new password must be at least 8 characters.
+                    </p>
+                    <form id="passwordForm" novalidate>
+                        <div class="form-group">
+                            <label class="form-label" for="currentPw">Current Password</label>
+                            <div style="position:relative">
+                                <input class="form-input" type="password" id="currentPw"
+                                    placeholder="Your current password" autocomplete="current-password"
+                                    style="padding-right:42px" />
+                                <button type="button" class="input-toggle" id="toggleCurrentPw"
+                                    aria-label="Toggle visibility">👁</button>
+                            </div>
+                            <div class="field-error" id="currentPwErr"></div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="newPw">New Password</label>
+                            <div style="position:relative">
+                                <input class="form-input" type="password" id="newPw" placeholder="Min. 8 characters"
+                                    autocomplete="new-password" style="padding-right:42px" />
+                                <button type="button" class="input-toggle" id="toggleNewPw"
+                                    aria-label="Toggle visibility">👁</button>
+                            </div>
+                            <div class="field-error" id="newPwErr"></div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="confirmPw">Confirm New Password</label>
+                            <div style="position:relative">
+                                <input class="form-input" type="password" id="confirmPw"
+                                    placeholder="Re-enter new password" autocomplete="new-password"
+                                    style="padding-right:42px" />
+                                <button type="button" class="input-toggle" id="toggleConfirmPw"
+                                    aria-label="Toggle visibility">👁</button>
+                            </div>
+                            <div class="field-error" id="confirmPwErr"></div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-full" id="savePasswordBtn"
+                            style="margin-top:8px">
+                            <span class="btn-text">🔐 Change Password</span>
+                        </button>
+                    </form>
+
+                    <!-- Danger zone -->
+                    <div style="margin-top:32px;padding-top:24px;border-top:1px solid var(--border)">
+                        <div
+                            style="font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--danger);margin-bottom:10px">
+                            Danger Zone</div>
+                        <button class="btn btn-ghost btn-full" id="logoutAllBtn"
+                            style="justify-content:center;margin-bottom:12px">
+                            🚪 Logout from this device
+                        </button>
+                        <button class="btn btn-danger btn-full" id="deleteAccountBtn"
+                            style="justify-content:center;background:rgba(231,76,60,0.1);color:var(--danger);border:1px solid rgba(231,76,60,0.2)">
+                            🗑️ Delete Restaurant Account
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </div><!-- /grid -->
+    </div><!-- /admin-main -->
+
+    <!-- ── Delete Account Confirmation Modal ── -->
+    <div class="modal-overlay hidden" id="deleteAccountModal" role="dialog" aria-modal="true">
+        <div class="modal" style="max-width:400px">
+            <div class="modal-header">
+                <span class="modal-title" style="color:var(--danger)">Delete Permanently?</span>
+                <button class="modal-close" id="closeDeleteModal">✕</button>
+            </div>
+            <div class="modal-body">
+                <div style="text-align:center;margin-bottom:20px">
+                    <div style="font-size:3rem;margin-bottom:10px">⚠️</div>
+                    <p style="font-weight:600;color:var(--dark);margin-bottom:8px">Are you absolutely sure?</p>
+                    <p style="font-size:.85rem;color:var(--muted);line-height:1.5">
+                        This will permanently delete your restaurant profile, menu items, orders, and tables.
+                        <strong>This action cannot be undone.</strong>
+                    </p>
+                </div>
+            </div>
+            <div class="modal-footer" style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+                <button class="btn btn-ghost" id="cancelDeleteBtn">Cancel</button>
+                <button class="btn btn-danger" id="confirmDeleteAccountBtn">Delete Forever</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/assets/js/admin-utils.js"></script>
+    <script src="/assets/js/profile-admin.js"></script>
+</body>
+
+</html>

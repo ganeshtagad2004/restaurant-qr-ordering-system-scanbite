@@ -1,0 +1,1351 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description"
+    content="ScanBite — India's premium pure veg QR ordering system. Skip the Queue, Scan the Menu." />
+  <meta name="keywords" content="ScanBite, restaurant ordering, QR menu, pure veg, table ordering system" />
+  <title>ScanBite — Skip the Queue, Scan the Menu</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700&display=swap"
+    rel="stylesheet" />
+
+  <style>
+    /* ── Reset & Tokens ────────────────────────────────── */
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      font-size: 16px;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: #faf8f5;
+      color: #2d2d2d;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    :root {
+      --primary: #ff6b35;
+      --primary-dark: #e85d2e;
+      --primary-light: #fff1eb;
+      --dark: #1a1a2e;
+      --text: #2d2d2d;
+      --muted: #8892a4;
+      --border: #eef0f4;
+      --card: #ffffff;
+      --radius: 14px;
+      --radius-lg: 22px;
+      --shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+      --shadow-hover: 0 12px 40px rgba(0, 0, 0, 0.14);
+    }
+
+    img {
+      display: block;
+      max-width: 100%;
+    }
+
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #dde1e8;
+      border-radius: 10px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--primary);
+    }
+
+    /* ── Toast ─────────────────────────────────────────── */
+    #toast-container {
+      position: fixed;
+      top: 24px;
+      right: 24px;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      pointer-events: none;
+    }
+
+    .toast {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 14px 18px;
+      border-radius: 12px;
+      background: #fff;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.14);
+      min-width: 280px;
+      max-width: 360px;
+      pointer-events: all;
+      animation: toast-in .35s cubic-bezier(.34, 1.56, .64, 1) forwards;
+      border-left: 4px solid transparent;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .toast.removing {
+      animation: toast-out .2s ease forwards;
+    }
+
+    .toast-icon {
+      font-size: 1.15rem;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .toast-body {
+      flex: 1;
+    }
+
+    .toast-title {
+      font-weight: 600;
+      font-size: .875rem;
+      margin-bottom: 2px;
+    }
+
+    .toast-msg {
+      font-size: .78rem;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+
+    .toast-close {
+      background: none;
+      border: none;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: .95rem;
+      padding: 0;
+    }
+
+    .toast-success {
+      border-left-color: #27ae60;
+    }
+
+    .toast-success .toast-icon {
+      color: #27ae60;
+    }
+
+    .toast-error {
+      border-left-color: #e74c3c;
+    }
+
+    .toast-error .toast-icon {
+      color: #e74c3c;
+    }
+
+    .toast-info {
+      border-left-color: #2980b9;
+    }
+
+    .toast-info .toast-icon {
+      color: #2980b9;
+    }
+
+    @keyframes toast-in {
+      from {
+        opacity: 0;
+        transform: translateX(110%)
+      }
+
+      to {
+        opacity: 1;
+        transform: translateX(0)
+      }
+    }
+
+    @keyframes toast-out {
+      from {
+        opacity: 1;
+        transform: translateX(0)
+      }
+
+      to {
+        opacity: 0;
+        transform: translateX(110%)
+      }
+    }
+
+    /* ── NAVBAR ────────────────────────────────────────────── */
+    .navbar {
+      position: sticky;
+      top: 0;
+      z-index: 200;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border);
+      box-shadow: 0 2px 16px rgba(0, 0, 0, 0.05);
+      padding: 0 40px;
+      height: 70px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      transition: box-shadow .25s ease;
+    }
+
+    .navbar.scrolled {
+      box-shadow: 0 4px 26px rgba(0, 0, 0, 0.1);
+    }
+
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+    }
+
+    .nav-brand-icon {
+      width: 38px;
+      height: 38px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      border-radius: 10px;
+      display: grid;
+      place-items: center;
+      font-size: 1.15rem;
+      box-shadow: 0 4px 12px rgba(255, 107, 53, .38);
+    }
+
+    .nav-brand-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 10px 24px;
+      border-radius: 50px;
+      font-size: .875rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: transform .22s ease, box-shadow .22s ease, background .22s ease, color .22s ease;
+      text-decoration: none;
+      white-space: nowrap;
+      user-select: none;
+    }
+
+    .btn:active {
+      transform: scale(.97) !important;
+    }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--text);
+      border-color: var(--border);
+    }
+
+    .btn-ghost:hover {
+      border-color: var(--muted);
+      background: #f4f4f5;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: #fff;
+      box-shadow: 0 4px 14px rgba(255, 107, 53, .38);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(255, 107, 53, .48);
+    }
+
+    .btn-outline {
+      background: transparent;
+      color: var(--primary);
+      border-color: var(--primary);
+    }
+
+    .btn-outline:hover {
+      background: var(--primary);
+      color: #fff;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(255, 107, 53, .35);
+    }
+
+    .btn-dark {
+      background: var(--dark);
+      color: #fff;
+      box-shadow: 0 4px 14px rgba(26, 26, 46, .28);
+    }
+
+    .btn-dark:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(26, 26, 46, .38);
+    }
+
+    .btn-lg {
+      padding: 14px 34px;
+      font-size: 1rem;
+    }
+
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 4px;
+    }
+
+    .hamburger span {
+      width: 24px;
+      height: 2px;
+      background: var(--text);
+      border-radius: 10px;
+      transition: transform .3s, opacity .3s;
+    }
+
+    /* Mobile nav */
+    .mobile-nav {
+      display: none;
+      flex-direction: column;
+      gap: 8px;
+      padding: 16px 20px 20px;
+      background: #fff;
+      border-top: 1px solid var(--border);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, .08);
+    }
+
+    .mobile-nav.open {
+      display: flex;
+    }
+
+    /* ── HERO ───────────────────────────────────────────────── */
+    .hero {
+      min-height: 100vh;
+      background: linear-gradient(145deg, #fff8f5 0%, #ffe8d6 55%, #fff3ec 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 100px 40px 80px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Decorative blobs */
+    .hero-blob {
+      position: absolute;
+      border-radius: 50%;
+      pointer-events: none;
+      filter: blur(70px);
+      animation: blob-drift 12s ease-in-out infinite alternate;
+    }
+
+    .blob-1 {
+      width: 480px;
+      height: 480px;
+      background: radial-gradient(circle, rgba(255, 107, 53, .15) 0%, transparent 70%);
+      top: -120px;
+      right: -120px;
+    }
+
+    .blob-2 {
+      width: 340px;
+      height: 340px;
+      background: radial-gradient(circle, rgba(243, 156, 18, .12) 0%, transparent 70%);
+      bottom: -80px;
+      left: -80px;
+      animation-delay: -5s;
+    }
+
+    .blob-3 {
+      width: 260px;
+      height: 260px;
+      background: radial-gradient(circle, rgba(255, 107, 53, .1) 0%, transparent 70%);
+      top: 40%;
+      left: 30%;
+      animation-delay: -9s;
+    }
+
+    @keyframes blob-drift {
+      from {
+        transform: translate(0, 0) scale(1);
+      }
+
+      to {
+        transform: translate(30px, 20px) scale(1.08);
+      }
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 1;
+      max-width: 780px;
+      text-align: center;
+      animation: hero-in .8s cubic-bezier(.34, 1.2, .64, 1) both;
+    }
+
+    @keyframes hero-in {
+      from {
+        opacity: 0;
+        transform: translateY(36px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .hero-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--primary-light);
+      border: 1.5px solid rgba(255, 107, 53, .25);
+      color: var(--primary);
+      font-size: .8rem;
+      font-weight: 600;
+      padding: 6px 16px;
+      border-radius: 50px;
+      margin-bottom: 28px;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      animation: hero-in .6s .1s both;
+    }
+
+    .hero-h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2.6rem, 7vw, 5rem);
+      font-weight: 700;
+      line-height: 1.12;
+      color: var(--dark);
+      margin-bottom: 6px;
+      animation: hero-in .7s .15s both;
+    }
+
+    .hero-h1-orange {
+      color: var(--primary);
+      display: block;
+    }
+
+    .hero-sub {
+      font-size: clamp(1rem, 2.5vw, 1.2rem);
+      color: var(--muted);
+      max-width: 520px;
+      margin: 20px auto 38px;
+      line-height: 1.75;
+      animation: hero-in .7s .22s both;
+    }
+
+    .hero-sub strong {
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    .hero-cta {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      flex-wrap: wrap;
+      animation: hero-in .7s .3s both;
+    }
+
+    /* Stats strip */
+    .hero-stats {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 32px;
+      flex-wrap: wrap;
+      margin-top: 60px;
+      padding-top: 40px;
+      border-top: 1px solid rgba(255, 107, 53, .18);
+      animation: hero-in .7s .38s both;
+    }
+
+    .hero-stat-item {
+      text-align: center;
+    }
+
+    .hero-stat-val {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.25rem;
+      font-weight: 700;
+      color: var(--primary);
+      line-height: 1;
+    }
+
+    .hero-stat-label {
+      font-size: .75rem;
+      color: var(--muted);
+      font-weight: 500;
+      margin-top: 4px;
+    }
+
+    /* ── FLOATING FOOD EMOJIS ──────────────────────────────── */
+    .floating-emojis {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+
+    .float-emoji {
+      position: absolute;
+      font-size: 2.4rem;
+      opacity: .22;
+      animation: emoji-float linear infinite;
+      user-select: none;
+      filter: saturate(.8);
+    }
+
+    @keyframes emoji-float {
+      0% {
+        transform: translateY(105vh) rotate(0deg);
+        opacity: 0;
+      }
+
+      10% {
+        opacity: .22;
+      }
+
+      90% {
+        opacity: .22;
+      }
+
+      100% {
+        transform: translateY(-10vh) rotate(360deg);
+        opacity: 0;
+      }
+    }
+
+    /* ── SECTION COMMONS ───────────────────────────────────── */
+    section {
+      padding: 96px 40px;
+    }
+
+    .section-eyebrow {
+      display: inline-block;
+      font-size: .72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .12em;
+      color: var(--primary);
+      margin-bottom: 12px;
+    }
+
+    .section-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.65rem, 4vw, 2.5rem);
+      font-weight: 700;
+      color: var(--dark);
+      line-height: 1.2;
+      margin-bottom: 14px;
+    }
+
+    .section-sub {
+      font-size: .975rem;
+      color: var(--muted);
+      max-width: 520px;
+      margin: 0 auto;
+      line-height: 1.75;
+    }
+
+    .section-header {
+      text-align: center;
+      margin-bottom: 60px;
+    }
+
+    .container {
+      max-width: 1160px;
+      margin: 0 auto;
+    }
+
+    /* ── FEATURES ──────────────────────────────────────────── */
+    .features {
+      background: #fff;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+      gap: 24px;
+    }
+
+    .feature-card {
+      background: var(--card);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border);
+      padding: 36px 32px;
+      box-shadow: var(--shadow);
+      transition: box-shadow .3s, transform .3s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .feature-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, var(--primary-light) 0%, transparent 60%);
+      opacity: 0;
+      transition: opacity .35s;
+    }
+
+    .feature-card:hover {
+      box-shadow: var(--shadow-hover);
+      transform: translateY(-6px);
+    }
+
+    .feature-card:hover::before {
+      opacity: 1;
+    }
+
+    .feature-icon-wrap {
+      width: 64px;
+      height: 64px;
+      border-radius: 16px;
+      background: var(--primary-light);
+      display: grid;
+      place-items: center;
+      font-size: 1.8rem;
+      margin-bottom: 24px;
+      position: relative;
+      box-shadow: 0 4px 14px rgba(255, 107, 53, .18);
+      transition: transform .3s;
+    }
+
+    .feature-card:hover .feature-icon-wrap {
+      transform: scale(1.08) rotate(-4deg);
+    }
+
+    .feature-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--dark);
+      margin-bottom: 10px;
+      position: relative;
+    }
+
+    .feature-desc {
+      font-size: .875rem;
+      color: var(--muted);
+      line-height: 1.75;
+      position: relative;
+    }
+
+    .feature-tag {
+      display: inline-block;
+      margin-top: 18px;
+      padding: 4px 14px;
+      border-radius: 50px;
+      font-size: .72rem;
+      font-weight: 600;
+      letter-spacing: .04em;
+      background: var(--primary-light);
+      color: var(--primary);
+      position: relative;
+    }
+
+    /* ── HOW IT WORKS ──────────────────────────────────────── */
+    .how-it-works {
+      background: linear-gradient(145deg, #fff8f5 0%, #ffe8d6 100%);
+    }
+
+    .steps-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 32px;
+      position: relative;
+    }
+
+    /* Connector line */
+    .steps-container::before {
+      content: '';
+      position: absolute;
+      top: 44px;
+      left: 12%;
+      right: 12%;
+      height: 2px;
+      background: repeating-linear-gradient(90deg, var(--primary) 0, var(--primary) 10px, transparent 10px, transparent 20px);
+      opacity: .35;
+    }
+
+    .step-card {
+      background: rgba(255, 255, 255, .85);
+      backdrop-filter: blur(8px);
+      border-radius: var(--radius-lg);
+      border: 1px solid rgba(255, 107, 53, .15);
+      padding: 36px 28px 32px;
+      text-align: center;
+      box-shadow: 0 4px 20px rgba(255, 107, 53, .08);
+      transition: box-shadow .3s, transform .3s;
+      position: relative;
+      z-index: 1;
+    }
+
+    .step-card:hover {
+      box-shadow: 0 12px 36px rgba(255, 107, 53, .16);
+      transform: translateY(-5px);
+    }
+
+    .step-number {
+      width: 56px;
+      height: 56px;
+      margin: 0 auto 22px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      font-family: 'Playfair Display', serif;
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: #fff;
+      box-shadow: 0 6px 18px rgba(255, 107, 53, .4);
+      position: relative;
+    }
+
+    .step-number::after {
+      content: '';
+      position: absolute;
+      inset: -4px;
+      border-radius: 50%;
+      border: 2px solid rgba(255, 107, 53, .3);
+      animation: pulse-ring 2.5s ease-in-out infinite;
+    }
+
+    @keyframes pulse-ring {
+
+      0%,
+      100% {
+        transform: scale(1);
+        opacity: .6;
+      }
+
+      50% {
+        transform: scale(1.18);
+        opacity: 0;
+      }
+    }
+
+    .step-icon {
+      font-size: 2rem;
+      margin-bottom: 14px;
+    }
+
+    .step-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--dark);
+      margin-bottom: 10px;
+    }
+
+    .step-desc {
+      font-size: .85rem;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    /* ── CTA BAND ───────────────────────────────────────────── */
+    .cta-band {
+      background: linear-gradient(135deg, var(--dark) 0%, #16213e 100%);
+      padding: 80px 40px;
+      text-align: center;
+    }
+
+    .cta-band h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.6rem, 4vw, 2.4rem);
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 14px;
+    }
+
+    .cta-band h2 span {
+      color: var(--primary);
+    }
+
+    .cta-band p {
+      color: rgba(255, 255, 255, .55);
+      font-size: .975rem;
+      max-width: 460px;
+      margin: 0 auto 36px;
+      line-height: 1.75;
+    }
+
+    .cta-band .btn-primary {
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    }
+
+    /* ── FOOTER ─────────────────────────────────────────────── */
+    footer {
+      background: var(--dark);
+      color: rgba(255, 255, 255, .75);
+      padding: 60px 40px 36px;
+    }
+
+    .footer-inner {
+      max-width: 1160px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1.4fr 1fr 1fr 1fr;
+      gap: 40px;
+      margin-bottom: 50px;
+    }
+
+    .footer-brand-icon {
+      width: 42px;
+      height: 42px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      border-radius: 10px;
+      display: grid;
+      place-items: center;
+      font-size: 1.2rem;
+      margin-bottom: 14px;
+      box-shadow: 0 4px 14px rgba(255, 107, 53, .38);
+    }
+
+    .footer-brand-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 10px;
+    }
+
+    .footer-brand-desc {
+      font-size: .825rem;
+      line-height: 1.7;
+      color: rgba(255, 255, 255, .45);
+    }
+
+    .footer-col-title {
+      font-size: .72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      color: rgba(255, 255, 255, .35);
+      margin-bottom: 16px;
+    }
+
+    .footer-links {
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
+    }
+
+    .footer-links a {
+      font-size: .85rem;
+      color: rgba(255, 255, 255, .55);
+      transition: color .2s;
+    }
+
+    .footer-links a:hover {
+      color: var(--primary);
+    }
+
+    .footer-bottom {
+      max-width: 1160px;
+      margin: 0 auto;
+      border-top: 1px solid rgba(255, 255, 255, .08);
+      padding-top: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .footer-bottom p {
+      font-size: .8rem;
+      color: rgba(255, 255, 255, .32);
+    }
+
+    .footer-bottom span {
+      color: var(--primary);
+    }
+
+    /* ── SCROLL ANIMATIONS ──────────────────────────────────── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity .65s ease, transform .65s ease;
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .reveal-delay-1 {
+      transition-delay: .1s;
+    }
+
+    .reveal-delay-2 {
+      transition-delay: .2s;
+    }
+
+    .reveal-delay-3 {
+      transition-delay: .3s;
+    }
+
+    /* ── RESPONSIVE ─────────────────────────────────────────── */
+    @media (max-width: 960px) {
+      .footer-inner {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .steps-container::before {
+        display: none;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .navbar {
+        padding: 0 20px;
+      }
+
+      .nav-right {
+        display: none;
+      }
+
+      .hamburger {
+        display: flex;
+      }
+
+      section {
+        padding: 64px 20px;
+      }
+
+      .hero {
+        padding: 90px 20px 64px;
+      }
+
+      .hero-stats {
+        gap: 24px;
+        margin-top: 44px;
+      }
+
+      .cta-band {
+        padding: 60px 20px;
+      }
+
+      footer {
+        padding: 50px 20px 28px;
+      }
+
+      .footer-inner {
+        grid-template-columns: 1fr;
+        gap: 32px;
+      }
+
+      .footer-bottom {
+        flex-direction: column;
+        text-align: center;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .hero-cta {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .btn-lg {
+        text-align: center;
+        justify-content: center;
+      }
+
+      .features-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- ── Toast Container ───────────────────────────── -->
+  <div id="toast-container" aria-live="polite"></div>
+
+  <!-- ── NAVBAR ───────────────────────────────────── -->
+  <nav class="navbar" id="mainNav" role="navigation" aria-label="Main navigation">
+    <a href="/" class="nav-brand" id="navBrand">
+      <div class="nav-brand-icon" aria-hidden="true">🌿</div>
+      <span class="nav-brand-name">ScanBite</span>
+    </a>
+
+    <div class="nav-right">
+      <a href="/auth/login.html" class="btn btn-ghost" id="navLogin">Login</a>
+      <a href="/auth/register.html" class="btn btn-primary" id="navRegister">Register Free</a>
+    </div>
+
+    <button class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+
+  <!-- Mobile Nav -->
+  <div class="mobile-nav" id="mobileNav" role="navigation" aria-label="Mobile navigation">
+    <a href="/auth/login.html" class="btn btn-ghost btn-lg" id="mobileLogin">Login</a>
+    <a href="/auth/register.html" class="btn btn-primary btn-lg" id="mobileRegister">Register Free</a>
+  </div>
+
+  <!-- ── HERO ─────────────────────────────────────── -->
+  <section class="hero" id="hero" aria-label="Hero section">
+    <!-- Floating Emojis -->
+    <div class="floating-emojis" aria-hidden="true" id="floatingEmojis"></div>
+
+    <!-- Blobs -->
+    <div class="hero-blob blob-1" aria-hidden="true"></div>
+    <div class="hero-blob blob-2" aria-hidden="true"></div>
+    <div class="hero-blob blob-3" aria-hidden="true"></div>
+
+    <div class="hero-content">
+      <div class="hero-eyebrow" id="heroEyebrow">
+        🌿 &nbsp;India's Premium Pure Veg Ordering System
+      </div>
+
+      <h1 class="hero-h1" id="heroH1">
+        Skip the Queue,
+        <span class="hero-h1-orange">Scan the Menu.</span>
+      </h1>
+
+      <p class="hero-sub" id="heroSub">
+        Give your guests a <strong>seamless QR-based ordering experience</strong>.
+        Print QR codes, let tables order from their phones, and manage everything
+        from one powerful dashboard.
+      </p>
+
+      <div class="hero-cta" id="heroCta">
+        <a href="/auth/register.html" class="btn btn-primary btn-lg" id="heroGetStarted">
+          🚀 &nbsp;Get Started — It's Free
+        </a>
+        <a href="/auth/login.html" class="btn btn-outline btn-lg" id="heroAdminLogin">
+          🔒 &nbsp;Admin Login
+        </a>
+      </div>
+
+      <div class="hero-stats" id="heroStats">
+        <div class="hero-stat-item">
+          <div class="hero-stat-val">QR</div>
+          <div class="hero-stat-label">Table Ordering</div>
+        </div>
+        <div class="hero-stat-item">
+          <div class="hero-stat-val">Live</div>
+          <div class="hero-stat-label">Order Dashboard</div>
+        </div>
+        <div class="hero-stat-item">
+          <div class="hero-stat-val">100%</div>
+          <div class="hero-stat-label">Pure Vegetarian</div>
+        </div>
+        <div class="hero-stat-item">
+          <div class="hero-stat-val">∞</div>
+          <div class="hero-stat-label">Menu Items</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── FEATURES ─────────────────────────────────── -->
+  <section class="features" id="features" aria-label="Features">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-eyebrow">Why ScanBite</span>
+        <h2 class="section-title reveal">Everything you need to run a<br />modern pure veg restaurant</h2>
+        <p class="section-sub reveal reveal-delay-1">
+          From table QR codes to live analytics — built for restaurant owners who
+          want a premium, zero-hassle digital experience.
+        </p>
+      </div>
+
+      <div class="features-grid">
+        <article class="feature-card reveal" id="featureQR">
+          <div class="feature-icon-wrap" aria-hidden="true">📱</div>
+          <h3 class="feature-title">QR Table Ordering</h3>
+          <p class="feature-desc">
+            Auto-generate unique QR codes for every table. Guests scan, browse your
+            full menu and place orders — no app download, no waiting.
+          </p>
+          <span class="feature-tag">Instant Setup</span>
+        </article>
+
+        <article class="feature-card reveal reveal-delay-1" id="featureDashboard">
+          <div class="feature-icon-wrap" aria-hidden="true">📊</div>
+          <h3 class="feature-title">Live Dashboard</h3>
+          <p class="feature-desc">
+            Monitor every order in real time. Track today's revenue, monthly
+            performance, top dishes, and pending orders from one beautiful screen.
+          </p>
+          <span class="feature-tag">Real-Time Analytics</span>
+        </article>
+
+        <article class="feature-card reveal reveal-delay-2" id="featureVeg">
+          <div class="feature-icon-wrap" aria-hidden="true">🌿</div>
+          <h3 class="feature-title">100% Pure Veg</h3>
+          <p class="feature-desc">
+            Built exclusively for India's pure veg dining culture. Every feature is
+            designed with vegetarian restaurants in mind — including veg badges
+            and category groupings.
+          </p>
+          <span class="feature-tag">Veg Certified</span>
+        </article>
+
+        <article class="feature-card reveal" id="featureMenu">
+          <div class="feature-icon-wrap" aria-hidden="true">🍽️</div>
+          <h3 class="feature-title">Menu Items</h3>
+          <p class="feature-desc">
+            Create and manage unlimited menu items with images, prices, and categories.
+            Update your menu anytime and keep it instantly synced with your QR ordering system.
+          </p>
+          <span class="feature-tag">Live Updates</span>
+        </article>
+
+        <article class="feature-card reveal reveal-delay-1" id="featureOrders">
+          <div class="feature-icon-wrap" aria-hidden="true">🔔</div>
+          <h3 class="feature-title">Order Management</h3>
+          <p class="feature-desc">
+            Accept, track, and update orders with one click. Move orders from
+            Pending → Preparing → Served → Paid. Every action logged.
+          </p>
+          <span class="feature-tag">Streamlined Flow</span>
+        </article>
+
+        <article class="feature-card reveal reveal-delay-2" id="featureSecurity">
+          <div class="feature-icon-wrap" aria-hidden="true">🔐</div>
+          <h3 class="feature-title">Secure & Private</h3>
+          <p class="feature-desc">
+            JWT-based authentication with HTTP-only cookies. Admin data is
+            isolated per restaurant. No cross-tenant access, ever.
+          </p>
+          <span class="feature-tag">Enterprise Security</span>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── HOW IT WORKS ──────────────────────────────── -->
+  <section class="how-it-works" id="howItWorks" aria-label="How it works">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-eyebrow">Getting Started</span>
+        <h2 class="section-title reveal">Up and running in<br />three simple steps</h2>
+        <p class="section-sub reveal reveal-delay-1">
+          No technical knowledge required. If you can fill a form, you can
+          run ScanBite.
+        </p>
+      </div>
+
+      <div class="steps-container">
+        <article class="step-card reveal" id="step1">
+          <div class="step-number" aria-label="Step 1">1</div>
+          <div class="step-icon" aria-hidden="true">📝</div>
+          <h3 class="step-title">Register Your Restaurant</h3>
+          <p class="step-desc">
+            Create your free account in under two minutes. Pick a restaurant name
+            and get a unique shareable slug for your menu link.
+          </p>
+        </article>
+
+        <article class="step-card reveal reveal-delay-1" id="step2">
+          <div class="step-number" aria-label="Step 2">2</div>
+          <div class="step-icon" aria-hidden="true">🍛</div>
+          <h3 class="step-title">Add Menu & Generate QR Codes</h3>
+          <p class="step-desc">
+            Upload your dishes with photos, prices, and categories. Then generate
+            QR codes for every table in one click — print and place them.
+          </p>
+        </article>
+
+        <article class="step-card reveal reveal-delay-2" id="step3">
+          <div class="step-number" aria-label="Step 3">3</div>
+          <div class="step-icon" aria-hidden="true">📲</div>
+          <h3 class="step-title">Customers Scan, Order & Pay</h3>
+          <p class="step-desc">
+            Guests scan the QR, browse the live menu, and place orders directly
+            to your kitchen. No app. No friction. Pure delight.
+          </p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── CTA BAND ──────────────────────────────────── -->
+  <section class="cta-band" id="ctaBand" aria-label="Call to action">
+    <div class="container" style="text-align:center">
+      <h2 class="reveal">Ready to serve <span>smarter?</span></h2>
+      <p class="reveal reveal-delay-1">
+        Join the growing community of pure veg restaurants transforming their
+        dining experience with ScanBite.
+      </p>
+      <div class="reveal reveal-delay-2">
+        <a href="/auth/register.html" class="btn btn-primary btn-lg" id="ctaRegisterBtn">
+          🌿 &nbsp;Start For Free Today
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── FOOTER ────────────────────────────────────── -->
+  <footer id="mainFooter" role="contentinfo">
+    <div class="footer-inner">
+      <div>
+        <div class="footer-brand-icon" aria-hidden="true">🌿</div>
+        <div class="footer-brand-name">ScanBite</div>
+        <p class="footer-brand-desc">
+          The premium QR-based table ordering system built exclusively for
+          India's pure vegetarian restaurants.
+        </p>
+      </div>
+
+      <div>
+        <div class="footer-col-title">Product</div>
+        <nav class="footer-links" aria-label="Product links">
+          <a href="#features">Features</a>
+          <a href="#howItWorks">How It Works</a>
+          <a href="/auth/register.html">Get Started</a>
+          <a href="/auth/login.html">Admin Login</a>
+        </nav>
+      </div>
+
+      <div>
+        <div class="footer-col-title">Menu Categories</div>
+        <nav class="footer-links" aria-label="Menu categories">
+          <a href="#features">Starters & Soups</a>
+          <a href="#features">Main Course</a>
+          <a href="#features">Breads & Rice</a>
+          <a href="#features">Desserts & Beverages</a>
+        </nav>
+      </div>
+
+      <div>
+        <div class="footer-col-title">Details</div>
+        <nav class="footer-links" aria-label="Details links">
+          <a href="#hero">Pure Veg Only</a>
+          <a href="#features">QR Ordering</a>
+          <a href="#features">Live Dashboard</a>
+          <a href="#howItWorks">3-Step Setup</a>
+        </nav>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <p>© 2026 <span>ScanBite</span>. All rights reserved.</p>
+      <p>Made with 🧡 for pure veg restaurants across India</p>
+    </div>
+  </footer>
+
+  <script>
+    /* ── Navbar scroll shadow ──────────────────── */
+    const nav = document.getElementById('mainNav');
+    window.addEventListener('scroll', () => {
+      nav.classList.toggle('scrolled', window.scrollY > 10);
+    }, { passive: true });
+
+    /* ── Mobile nav toggle ─────────────────────── */
+    const hamburger = document.getElementById('hamburger');
+    const mobileNav = document.getElementById('mobileNav');
+    hamburger.addEventListener('click', () => {
+      const open = mobileNav.classList.toggle('open');
+      hamburger.setAttribute('aria-expanded', open);
+    });
+
+    /* ── Floating food emojis ──────────────────── */
+    const emojis = ['🍛', '🥗', '🍜', '🌿', '🥘', '🍲', '🥙', '🫓', '🍱', '🧆'];
+    const container = document.getElementById('floatingEmojis');
+    const TOTAL = 14;
+    for (let i = 0; i < TOTAL; i++) {
+      const el = document.createElement('span');
+      el.className = 'float-emoji';
+      el.textContent = emojis[i % emojis.length];
+      el.style.left = `${Math.random() * 92 + 2}%`;
+      el.style.fontSize = `${Math.random() * 1.4 + 1.6}rem`;
+      el.style.animationDuration = `${Math.random() * 10 + 12}s`;
+      el.style.animationDelay = `${Math.random() * -18}s`;
+      el.style.opacity = (Math.random() * 0.18 + 0.08).toFixed(2);
+      container.appendChild(el);
+    }
+
+    /* ── Scroll reveal ─────────────────────────── */
+    const revealEls = document.querySelectorAll('.reveal');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+    }, { threshold: 0.12, rootMargin: '0px 0px -30px 0px' });
+    revealEls.forEach(el => observer.observe(el));
+
+    /* ── Toast helper ──────────────────────────── */
+    function showToast(type, title, msg) {
+      const tc = document.getElementById('toast-container');
+      if (!tc) return;
+      const icons = { success: '✅', error: '❌', info: 'ℹ️', warning: '⚠️' };
+      const t = document.createElement('div');
+      t.className = `toast toast-${type}`;
+      t.innerHTML = `
+        <span class="toast-icon">${icons[type] || 'ℹ️'}</span>
+        <div class="toast-body">
+          <div class="toast-title">${title}</div>
+          ${msg ? `<div class="toast-msg">${msg}</div>` : ''}
+        </div>
+        <button class="toast-close" aria-label="Close notification">✕</button>`;
+      tc.appendChild(t);
+      const remove = () => {
+        t.classList.add('removing');
+        setTimeout(() => t.remove(), 220);
+      };
+      t.querySelector('.toast-close').addEventListener('click', remove);
+      setTimeout(remove, 4000);
+    }
+
+    /* ── Auth check on load ────────────────────── */
+    (async function checkAuth() {
+      try {
+        const res = await fetch('/api/auth/me', { credentials: 'include' });
+        if (res.ok) {
+          const data = await res.json();
+          if (data.success) {
+            // Restaurant owner is already logged in, go to dashboard
+            window.location.replace('/admin/dashboard.html');
+          }
+        }
+      } catch (_) { }
+    })();
+  </script>
+</body>
+
+</html>

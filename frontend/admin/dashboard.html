@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <meta name="robots" content="noindex" />
+    <title>Dashboard — ScanBite Admin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="/assets/css/style.css" />
+    <link rel="stylesheet" href="/assets/css/admin.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js" defer></script>
+</head>
+
+<body class="admin-body">
+
+    <div id="sidebarMount"></div>
+
+    <div class="admin-main" id="adminMain">
+        <!-- Top bar -->
+        <div class="admin-topbar">
+            <div class="admin-topbar-left">
+                <button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle sidebar">☰</button>
+                <div class="page-title">Dashboard</div>
+                <div class="page-subtitle" id="dashDate">Loading…</div>
+            </div>
+            <div class="admin-topbar-right">
+                <div id="liveClock"
+                    style="font-weight:600; font-size:1rem; color:var(--primary); margin-right:20px; border-right:1px solid var(--border); padding-right:20px">
+                    --:-- --</div>
+                <button class="btn btn-primary btn-sm" id="refreshBtn" aria-label="Refresh dashboard">🔄
+                    Refresh</button>
+            </div>
+        </div>
+
+        <!-- Toast container -->
+        <div id="toast-container" aria-live="polite"></div>
+
+        <!-- Stats grid -->
+        <div class="stats-grid" id="statsGrid">
+            <div class="stat-card stat-card-orange">
+                <div class="stat-icon stat-icon-orange" aria-hidden="true">📦</div>
+                <div class="stat-info">
+                    <div class="stat-label">Today's Orders</div>
+                    <div class="stat-value" id="statTodayOrders">—</div>
+                </div>
+            </div>
+            <div class="stat-card stat-card-green">
+                <div class="stat-icon stat-icon-green" aria-hidden="true">💰</div>
+                <div class="stat-info">
+                    <div class="stat-label">Today's Revenue</div>
+                    <div class="stat-value" id="statTodayRevenue">—</div>
+                </div>
+            </div>
+            <div class="stat-card stat-card-blue">
+                <div class="stat-icon stat-icon-blue" aria-hidden="true">📅</div>
+                <div class="stat-info">
+                    <div class="stat-label">Monthly Orders</div>
+                    <div class="stat-value" id="statMonthlyOrders">—</div>
+                </div>
+            </div>
+            <div class="stat-card stat-card-gold">
+                <div class="stat-icon stat-icon-gold" aria-hidden="true">📈</div>
+                <div class="stat-info">
+                    <div class="stat-label">Monthly Revenue</div>
+                    <div class="stat-value" id="statMonthlyRevenue">—</div>
+                </div>
+            </div>
+            <div class="stat-card stat-card-danger">
+                <div class="stat-icon stat-icon-danger" aria-hidden="true">⏳</div>
+                <div class="stat-info">
+                    <div class="stat-label">Pending Orders</div>
+                    <div class="stat-value" id="statPending">—</div>
+                </div>
+            </div>
+            <div class="stat-card stat-card-orange">
+                <div class="stat-icon stat-icon-orange" aria-hidden="true">🍽️</div>
+                <div class="stat-info">
+                    <div class="stat-label">Total Menu Items</div>
+                    <div class="stat-value" id="statItems">—</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts -->
+        <div class="charts-grid" id="chartsGrid">
+            <div class="chart-card">
+                <div class="chart-title">
+                    <span>Orders — Last 7 Days</span>
+                    <span class="badge badge-orange" style="font-size:.72rem">Bar Chart</span>
+                </div>
+                <div class="chart-container">
+                    <canvas id="barChart" aria-label="Last 7 days orders chart"></canvas>
+                </div>
+            </div>
+            <div class="chart-card">
+                <div class="chart-title">
+                    <span>Top 5 Items</span>
+                    <span class="badge badge-green" style="font-size:.72rem">By Orders</span>
+                </div>
+                <div class="chart-container">
+                    <canvas id="doughnutChart" aria-label="Top 5 menu items chart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent orders table -->
+        <div class="admin-list-panel" id="recentOrdersPanel">
+            <div class="card-header">
+                <span>Recent Orders</span>
+                <a href="/admin/orders.html" class="btn btn-outline btn-sm">View All →</a>
+            </div>
+            <div class="data-table-wrap">
+                <table class="data-table" id="recentOrdersTable" aria-label="Recent orders">
+                    <thead>
+                        <tr>
+                            <th>Table</th>
+                            <th>Items</th>
+                            <th>Total</th>
+                            <th>Status</th>
+                            <th>Time</th>
+                        </tr>
+                    </thead>
+                    <tbody id="recentOrdersBody">
+                        <tr>
+                            <td colspan="5" style="text-align:center;padding:32px;color:var(--muted)">Loading…</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div><!-- /admin-main -->
+
+    <script src="/assets/js/admin-utils.js"></script>
+    <script src="/assets/js/dashboard.js"></script>
+</body>
+
+</html>

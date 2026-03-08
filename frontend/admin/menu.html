@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <meta name="robots" content="noindex" />
+    <title>Menu Management — ScanBite Admin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="/assets/css/style.css" />
+    <link rel="stylesheet" href="/assets/css/admin.css" />
+</head>
+
+<body class="admin-body">
+
+    <div id="sidebarMount"></div>
+
+    <div class="admin-main" id="adminMain">
+        <div class="admin-topbar">
+            <div class="admin-topbar-left">
+                <button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle sidebar">☰</button>
+                <div class="page-title">Menu Management</div>
+                <div class="page-subtitle" id="menuCount">Loading…</div>
+            </div>
+        </div>
+
+        <div id="toast-container" aria-live="polite"></div>
+
+        <div class="admin-form-grid" id="menuGrid">
+            <!-- ── LEFT: Add / Edit Form ── -->
+            <div class="admin-form-panel" id="menuFormPanel">
+                <div class="card-header">
+                    <span class="card-title" id="formTitle">Add Menu Item</span>
+                    <button class="btn btn-ghost btn-sm" id="resetFormBtn" style="display:none"
+                        aria-label="Cancel edit">✕ Cancel</button>
+                </div>
+                <div class="admin-form-body">
+                    <form id="menuItemForm" novalidate>
+                        <input type="hidden" id="editItemId" />
+
+                        <div class="form-group">
+                            <label class="form-label" for="itemName">Name <span
+                                    style="color:var(--danger)">*</span></label>
+                            <input class="form-input" type="text" id="itemName" placeholder="e.g. Paneer Butter Masala"
+                                required />
+                            <div class="field-error" id="nameErr"></div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="itemDesc">Description</label>
+                            <textarea class="form-input form-textarea" id="itemDesc"
+                                placeholder="Short description of the dish…" style="min-height:76px"></textarea>
+                        </div>
+
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+                            <div class="form-group" style="margin-bottom:0">
+                                <label class="form-label" for="itemPrice">Price ₹ <span
+                                        style="color:var(--danger)">*</span></label>
+                                <input class="form-input" type="number" id="itemPrice" placeholder="199" min="0"
+                                    step="0.5" required />
+                                <div class="field-error" id="priceErr"></div>
+                            </div>
+                            <div class="form-group" style="margin-bottom:0">
+                                <label class="form-label" for="itemCategory">Category <span
+                                        style="color:var(--danger)">*</span></label>
+                                <select class="form-input form-select" id="itemCategory" required>
+                                    <option value="">— Select —</option>
+                                    <option value="Starters">🥗 Starters</option>
+                                    <option value="Soups">🍲 Soups</option>
+                                    <option value="Main Course">🍛 Main Course</option>
+                                    <option value="Breads">🫓 Breads</option>
+                                    <option value="Rice &amp; Biryani">🍚 Rice &amp; Biryani</option>
+                                    <option value="South Indian">🥞 South Indian</option>
+                                    <option value="Chaat">🥙 Chaat</option>
+                                    <option value="Thali">🍱 Thali</option>
+                                    <option value="Desserts">🍮 Desserts</option>
+                                    <option value="Beverages">🥤 Beverages</option>
+                                </select>
+                                <div class="field-error" id="categoryErr"></div>
+                            </div>
+                        </div>
+
+                        <!-- Image upload -->
+                        <div class="form-group" style="margin-top:16px">
+                            <label class="form-label">Item Image</label>
+                            <div class="image-upload-area" id="imageUploadArea">
+                                <input type="file" id="itemImage" accept="image/*" aria-label="Upload item image" />
+                                <div id="uploadPlaceholder">
+                                    <div class="image-upload-icon" aria-hidden="true">🖼️</div>
+                                    <div class="image-upload-text">Drop image here or <span>browse</span></div>
+                                    <div style="font-size:.72rem;color:var(--muted);margin-top:4px">Max 5 MB · JPG, PNG,
+                                        WEBP</div>
+                                </div>
+                                <div id="imagePreviewWrap" class="image-preview-wrap" style="display:none;width:100%">
+                                    <img id="imagePreview" src="" alt="Preview" />
+                                    <button type="button" class="image-preview-remove" id="removeImageBtn"
+                                        aria-label="Remove image">✕</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Available toggle -->
+                        <div class="form-group">
+                            <label class="form-label">Availability</label>
+                            <div class="toggle-wrap">
+                                <label class="toggle">
+                                    <input type="checkbox" id="itemAvailable" checked />
+                                    <span class="toggle-slider"></span>
+                                </label>
+                                <span class="toggle-label" id="availableLabel">Available</span>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-full" id="menuSubmitBtn"
+                            style="margin-top:8px">
+                            <span class="btn-text">➕ Add Item</span>
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- ── RIGHT: Menu items list ── -->
+            <div>
+                <!-- Toolbar -->
+                <div class="admin-list-panel"
+                    style="margin-bottom:0;border-radius:var(--radius) var(--radius) 0 0;border-bottom:none; position: sticky; top: 0; z-index: 10;">
+                    <div class="table-toolbar">
+                        <div class="table-search">
+                            <input type="search" id="menuSearch" placeholder="Search items…"
+                                aria-label="Search menu items" />
+                        </div>
+                        <select class="table-filter" id="categoryFilter" aria-label="Filter by category">
+                            <option value="">All Categories</option>
+                        </select>
+                        <span class="table-count" id="menuItemCount">— items</span>
+                    </div>
+                </div>
+
+                <!-- Grid -->
+                <div id="menuItemsGrid" style="
+        display:grid;
+        grid-template-columns:repeat(auto-fill,minmax(200px,1fr));
+        gap:14px;padding:16px;
+        background:var(--card);
+        border:1px solid var(--border);
+        border-radius:0 0 var(--radius) var(--radius);
+        min-height:200px;
+      " aria-label="Menu items grid">
+                    <div class="empty-state" id="menuEmptyState">
+                        <div class="empty-state-icon" aria-hidden="true">🍽️</div>
+                        <div class="empty-state-title">No items yet</div>
+                        <div class="empty-state-desc">Add your first menu item using the form</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete confirm modal -->
+    <div class="modal-overlay hidden" id="deleteModal" role="dialog" aria-modal="true" aria-label="Confirm delete">
+        <div class="modal">
+            <div class="modal-header">
+                <span class="modal-title">Delete Item</span>
+                <button class="modal-close" id="closeDeleteModal" aria-label="Close">✕</button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete <strong id="deleteItemName"></strong>? This cannot be undone.</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-ghost" id="cancelDeleteBtn">Cancel</button>
+                <button class="btn btn-danger" id="confirmDeleteBtn">Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/assets/js/admin-utils.js"></script>
+    <script src="/assets/js/menu-admin.js"></script>
+</body>
+
+</html>

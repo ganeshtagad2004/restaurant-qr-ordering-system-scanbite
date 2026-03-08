@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <meta name="robots" content="noindex" />
+    <title>Tables & QR — ScanBite Admin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="/assets/css/style.css" />
+    <link rel="stylesheet" href="/assets/css/admin.css" />
+</head>
+
+<body class="admin-body">
+
+    <div id="sidebarMount"></div>
+
+    <div class="admin-main" id="adminMain">
+        <div class="admin-topbar">
+            <div class="admin-topbar-left">
+                <button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle sidebar">☰</button>
+                <div class="page-title">Tables &amp; QR Codes</div>
+                <div class="page-subtitle" id="tableCount">Loading…</div>
+            </div>
+        </div>
+
+        <div id="toast-container" aria-live="polite"></div>
+
+        <!-- Generate panel -->
+        <div class="card" style="padding:24px;margin-bottom:28px;max-width:480px">
+            <h3 style="font-size:1rem;font-weight:700;color:var(--dark);margin-bottom:16px">
+                🪑 Generate Tables with QR Codes
+            </h3>
+            <p style="font-size:.85rem;color:var(--muted);margin-bottom:18px;line-height:1.6">
+                Enter how many tables your restaurant has. QR codes will be generated automatically.
+                Already existing table numbers will be skipped.
+            </p>
+            <div style="display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap">
+                <div class="form-group" style="margin:0;flex:1;min-width:140px">
+                    <label class="form-label" for="tableCountInput">Number of Tables</label>
+                    <input class="form-input" type="number" id="tableCountInput" placeholder="e.g. 10" min="1" max="200"
+                        aria-label="Number of tables to generate" />
+                </div>
+                <button class="btn btn-primary" id="generateBtn" aria-label="Generate QR codes">
+                    <span class="btn-text">⚡ Generate QR Codes</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Bulk Actions Panel -->
+        <div id="bulkActionsPanel" class="card"
+            style="padding:12px 20px;margin-bottom:20px;display:none;background:var(--bg-light);border:1px dashed var(--primary)">
+            <div style="display:flex;justify-content:space-between;align-items:center">
+                <div style="display:flex;align-items:center;gap:12px">
+                    <label
+                        style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:.9rem;font-weight:500">
+                        <input type="checkbox" id="selectAllTables"
+                            style="accent-color:var(--primary);width:18px;height:18px" />
+                        Select All
+                    </label>
+                    <span id="selectedCount" style="font-size:.85rem;color:var(--muted)">0 selected</span>
+                </div>
+                <button class="btn btn-danger btn-sm" id="deleteSelectedBtn">
+                    🗑️ Delete Selected
+                </button>
+            </div>
+        </div>
+
+        <!-- Table cards grid -->
+        <div id="tablesGrid" class="tables-grid" aria-label="Tables grid">
+            <div class="empty-state" id="tablesEmpty">
+                <div class="empty-state-icon" aria-hidden="true">🪑</div>
+                <div class="empty-state-title">No tables yet</div>
+                <div class="empty-state-desc">Generate tables above to create QR codes</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete confirm modal -->
+    <div class="modal-overlay hidden" id="deleteTableModal" role="dialog" aria-modal="true"
+        aria-label="Confirm delete table">
+        <div class="modal">
+            <div class="modal-header">
+                <span class="modal-title">Delete Table</span>
+                <button class="modal-close" id="closeTableDeleteModal" aria-label="Close">✕</button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete <strong id="deleteTableName"></strong>? The QR code will be
+                    permanently removed.</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-ghost" id="cancelTableDeleteBtn">Cancel</button>
+                <button class="btn btn-danger" id="confirmTableDeleteBtn">Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/assets/js/admin-utils.js"></script>
+    <script src="/assets/js/tables-admin.js"></script>
+</body>
+
+</html>
