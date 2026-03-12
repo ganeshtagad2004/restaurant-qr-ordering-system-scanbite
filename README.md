@@ -37,4 +37,4 @@ node backend/server.js
 http://localhost:5000
 
 ## Author
-Ganesh Tagad
+Ganesh 
